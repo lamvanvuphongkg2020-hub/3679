@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffe5ef" />
+  <title>Daily Wishes ♡</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --pink: #f7a9c4;
+      --deep: #c95f8a;
+      --ink: #74465a;
+      --cream: #fff9fb;
+      --font-heading: "Playfair Display", Georgia, serif;
+      --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; overflow-x: hidden; color: var(--ink); font-family: var(--font-body);
+      background: linear-gradient(135deg, #fff1f6 0%, #ffe0ec 48%, #fceafa 100%);
+      display: flex; flex-direction: column; align-items: center; padding: 24px 16px;
+    }
+    .page { width: min(100%, 720px); display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 40px; }
+    .wish-card, .section-box {
+      width: min(100%, 480px); padding: 24px; border-radius: 28px;
+      background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.9);
+      box-shadow: 0 16px 40px rgba(190, 100, 140, .12); backdrop-filter: blur(12px); text-align: center;
+    }
+    .wish-card { padding: 45px 30px 30px; }
+    .eyebrow { color: #c77b9b; letter-spacing: .22em; font-size: 11px; font-weight: 700; }
+    h1 { margin: 8px 0 4px; color: #c45f89; font-family: var(--font-heading); font-size: 32px; }
+    .date { color: #b68a9d; font-size: 13px; margin-bottom: 14px; }
+    .attendance-box {
+      margin: 4px auto 14px; padding: 6px 14px; background: rgba(255,255,255,0.9);
+      border-radius: 20px; border: 1px solid #f2c7d8; font-size: 12px; color: #b85f86; display: inline-flex; gap: 6px;
+    }
+    .attendance-box strong { color: #c45f89; }
+    #wish { min-height: 90px; display: grid; place-items: center; font-family: var(--font-heading); font-size: 22px; line-height: 1.6; color: #795166; padding: 0 10px; }
+    .from { margin-top: 14px; color: #c1849e; font-size: 13px; font-style: italic; }
+    .actions { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    button {
+      border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer;
+      font-family: var(--font-body); font-size: 12px; font-weight: 600; transition: transform .2s;
+    }
+    button:hover { transform: translateY(-2px); }
+    .primary { background: linear-gradient(135deg, #f3a8c2, #df80a5); color: white; }
+    .secondary { background: #fff; color: #c16b91; border: 1px solid #f5d2df; }
+    .reward-btn { background: linear-gradient(135deg, #ffd700, #ff9800); color: #fff; font-weight: 700; }
+    .field-input, .field-textarea {
+      width: 100%; font-family: var(--font-body); font-size: 13px; color: #74465a;
+      border: 1px solid #f0cada; border-radius: 12px; padding: 10px 12px; background: white; outline: none; margin-bottom: 10px; text-align: left;
+    }
+    .field-textarea { min-height: 70px; resize: vertical; }
+    .plan-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 12px; text-align: left; }
+    .plan-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #fff; border: 1px solid #f5dce6; border-radius: 12px; font-size: 12px; }
+    .plan-item.completed span { text-decoration: line-through; opacity: 0.6; }
+    .reward-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(91,49,68,.4); backdrop-filter: blur(8px); place-items: center; padding: 20px; }
+    .reward-modal.open { display: grid; }
+    .reward-card { background: #fff; padding: 30px; border-radius: 28px; text-align: center; max-width: 400px; width: 100%; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="wish-card">
+      <div class="eyebrow">A LITTLE NOTE FOR YOU</div>
+      <h1>Daily Wishes</h1>
+      <div class="date" id="today"></div>
+      
+      <div class="attendance-box">
+        📅 Điểm danh tháng: <strong id="streakCount">0</strong>/<span id="totalDaysInMonth">30</span> ngày
+      </div>
+
+      <div id="wish">Chúc bạn một ngày thật dịu dàng và tràn ngập niềm vui ♡</div>
+      <div class="from" id="fromText">Gửi bạn một ngày thật dịu dàng ♡</div>
+      
+      <div class="actions">
+        <button class="primary" id="todayWishBtn">Thông điệp hôm nay ✨</button>
+        <button class="reward-btn" id="claimRewardBtn" style="display: none;">🎁 Quay Thưởng Tháng</button>
+      </div>
+    </section>
+
+    <section class="section-box" style="text-align: left;">
+      <h3 style="margin:0 0 6px; color:#c45f89; font-family:var(--font-heading);">Góc Tâm Tư & Kế Hoạch Tuần ♡</h3>
+      <p style="margin:0 0 14px; color:#a77c90; font-size:12px;">Chia sẻ tâm sự hoặc lên lịch trình công việc trong tuần.</p>
+      
+      <label style="font-size:12px; font-weight:600; color:#8d5b72; display:block; margin-bottom:4px;">Gửi tâm sự / Lời nhắn:</label>
+      <textarea id="wishNoteInput" class="field-textarea" placeholder="Hôm nay bạn thế nào? Nhập tâm sự ở đây nhé..."></textarea>
+      
+      <label style="font-size:12px; font-weight:600; color:#8d5b72; display:block; margin-bottom:4px;">Thêm kế hoạch trong tuần:</label>
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input id="planTitleInput" class="field-input" style="margin-bottom:0;" placeholder="Ví dụ: Đi cà phê..." />
+        <button class="primary" id="addPlanBtn" style="white-space:nowrap;">Thêm</button>
+      </div>
+
+      <div class="plan-list" id="planList"></div>
+      <button class="primary" id="sendAdminBtn" style="width:100%; margin-top:4px;">📨 Gửi Tâm Tư Cho Admin</button>
+    </section>
+  </main>
+
+  <div class="reward-modal" id="rewardModal">
+    <div class="reward-card">
+      <h2>🎉 QUAY THƯỞNG CUỐI THÁNG! 🎉</h2>
+      <p id="rewardResultText">Bạn đã hoàn thành điểm danh tháng!</p>
+      <button class="primary" id="spinRewardBtn">🎁 Mở Hộp Quà Ngay</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://envpdufjfclpnqygxrfl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_qfHG3ox5ILnRs4e2g8-fsA_Z-xHZSdl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const recipientName = "Bé Yêu"; 
+
+    function getDaysInCurrentMonth() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    }
+    document.getElementById("totalDaysInMonth").textContent = getDaysInCurrentMonth();
+
+    const wishesList = [
+      "Chúc bạn hôm nay luôn mỉm cười, gặp thật nhiều điều may mắn và bình yên. ♡",
+      "Mong mọi điều tốt đẹp sẽ nhẹ nhàng tìm đến bạn, như nắng ghé qua ô cửa. 🌷",
+      "Chúc bạn ăn ngon, ngủ ngoan, làm gì cũng thuận lợi và luôn được yêu thương.",
+      "Mỗi ngày là một khởi đầu mới. Chúc bạn luôn tin vào những điều tốt đẹp phía trước."
+    ];
+
+    function showDailyWish() {
+      const idx = Math.floor(Math.random() * wishesList.length);
+      document.getElementById("wish").textContent = wishesList[idx];
+    }
+
+    // Điểm danh khớp cột `visit_date` (kiểu date) và `visited_at` (kiểu timestamptz)[cite: 7]
+    async function processDailyAttendance() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`; // Định dạng chuẩn YYYY-MM-DD cho kiểu dữ liệu date của Supabase
+      const timeString = now.toISOString();
+
+      // Ghi nhận điểm danh vào bảng attendance
+      await supabase.from('attendance').upsert([
+        { visit_date: dateString, visited_at: timeString }
+      ], { onConflict: 'visit_date' });
+
+      // Lấy tổng số ngày đã điểm danh
+      const { data } = await supabase.from('attendance').select('*');
+      const totalChecked = data ? data.length : 1;
+      document.getElementById("streakCount").textContent = totalChecked;
+    }
+
+    // Kế hoạch tuần khớp cột `title` và `done`[cite: 9]
+    async function loadPlans() {
+      const { data } = await supabase.from('weekly_plans').select('*');
+      renderPlans(data || []);
+    }
+
+    function renderPlans(weeklyPlans) {
+      const listEl = document.getElementById("planList");
+      listEl.replaceChildren();
+      if (weeklyPlans.length === 0) {
+        listEl.innerHTML = `<div style="font-size:11px; color:#b895a5; text-align:center; padding:10px;">Chưa có kế hoạch nào.</div>`;
+        return;
+      }
+      weeklyPlans.setItem = weeklyPlans.forEach((plan) => {
+        const item = document.createElement("div");
+        item.className = `plan-item ${plan.done ? 'completed' : ''}`;
+        item.innerHTML = `<span>${plan.title}</span>`;
+        
+        const checkBtn = document.createElement("button");
+        checkBtn.className = "secondary";
+        checkBtn.textContent = plan.done ? "Bỏ qua" : "Xong";
+        checkBtn.onclick = async () => {
+          await supabase.from('weekly_plans').update({ done: !plan.done }).eq('id', plan.id);
+          loadPlans();
+        };
+        item.appendChild(checkBtn);
+        listEl.appendChild(item);
+      });
+    }
+
+    document.getElementById("addPlanBtn").onclick = async () => {
+      const input = document.getElementById("planTitleInput");
+      const val = input.value.trim();
+      if (!val) return;
+      await supabase.from('weekly_plans').insert([{ title: val, done: false }]);
+      input.value = "";
+      loadPlans();
+    };
+
+    // Gửi tâm tư khớp cột `content` và `created_at` trong bảng notes[cite: 8]
+    document.getElementById("sendAdminBtn").onclick = async () => {
+      const note = document.getElementById("wishNoteInput").value.trim();
+      if (!note) { alert("Vui lòng nhập nội dung!"); return; }
+
+      const { error } = await supabase.from('notes').insert([
+        { content: note, created_at: new Date().toISOString() }
+      ]);
+
+      if (error) {
+        alert("Gửi thất bại, kiểm tra lại kết nối!");
+      } else {
+        alert("Đã gửi tâm sự thành công! ♡");
+        document.getElementById("wishNoteInput").value = "";
+      }
+    };
+
+    showDailyWish();
+    processDailyAttendance();
+    loadPlans();
+    document.getElementById("todayWishBtn").onclick = showDailyWish;
+    document.getElementById("today").textContent = new Date().toLocaleDateString("vi-VN");
+  </script>
+</body>
+</html>
+```[cite: 7, 8, 9]
+
+---
+
+### 2. Cập nhật file `admin.html` (Trang quản lý trên máy tính)
+Bạn thay thế toàn bộ mã trong file `admin.html` bằng đoạn code sau để trang Admin đọc dữ liệu chính xác từ các bảng của bạn[cite: 7, 8, 9]:
+
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Daily Wishes ♡</title>
+  <style>
+    body { font-family: sans-serif; background: #fff5f8; color: #5c3547; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+    .container { width: min(100%, 760px); display: flex; flex-direction: column; gap: 20px; }
+    .card { background: rgba(255, 255, 255, 0.9); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(190, 100, 140, 0.1); }
+    h2 { color: #c95f8a; font-size: 18px; margin-top: 0; }
+    .item-card { background: white; border: 1px solid #f5dce6; border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header style="text-align: center;">
+      <h1>Bảng Điều Khiển Admin 👑</h1>
+      <p>Đồng bộ dữ liệu thời gian thực từ Supabase</p>
+    </header>
+
+    <div class="card">
+      <h2>📌 Tổng số ngày đã điểm danh</h2>
+      <div id="streakCount" style="font-size: 24px; font-weight: bold; color: #c95f8a;">0 ngày</div>
+    </div>
+
+    <div class="card">
+      <h2>💬 Tâm Tư Nguyện Vọng</h2>
+      <div id="notesList">Đang tải...</div>
+    </div>
+
+    <div class="card">
+      <h2>📅 Kế Hoạch Trong Tuần</h2>
+      <div id="plansList">Đang tải...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://envpdufjfclpnqygxrfl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_qfHG3ox5ILnRs4e2g8-fsA_Z-xHZSdl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadAdminDashboard() {
+      // 1. Điểm danh từ bảng attendance
+      const { data: attendanceData } = await supabase.from('attendance').select('*');
+      document.getElementById("streakCount").textContent = `${attendanceData ? attendanceData.length : 0} ngày`;
+
+      // 2. Tâm tư từ bảng notes
+      const { data: notesData } = await supabase.from('notes').select('*').order('created_at', { ascending: false });
+      const notesListEl = document.getElementById("notesList");
+      notesListEl.replaceChildren();
+
+      if (!notesData || notesData.length === 0) {
+        notesListEl.innerHTML = `<div>Chưa có tâm sự nào.</div>`;
+      } else {
+        notesData.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `<div>${item.content}</div><div style="font-size: 11px; color: #888; margin-top: 4px;">🕒 ${new Date(item.created_at).toLocaleString('vi-VN')}</div>`;
+          notesListEl.appendChild(card);
+        });
+      }
+
+      // 3. Kế hoạch từ bảng weekly_plans
+      const { data: plansData } = await supabase.from('weekly_plans').select('*');
+      const plansListEl = document.getElementById("plansList");
+      plansListEl.replaceChildren();
+
+      if (!plansData || plansData.length === 0) {
+        plansListEl.innerHTML = `<div>Chưa có kế hoạch tuần.</div>`;
+      } else {
+        plansData.forEach(plan => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `<strong>${plan.done ? '[Đã xong]' : '[Chưa làm]'}</strong> ${plan.title}`;
+          plansListEl.appendChild(card);
+        });
+      }
+    }
+
+    // Lắng nghe Realtime thay đổi tự động
+    supabase.channel('public:notes')
+      .on('postgres_changes', { event: '*', schema: 'public' }, () => { loadAdminDashboard(); })
+      .subscribe();
+
+    loadAdminDashboard();
+  </script>
+</body>
+</html>
+```[cite: 7, 8, 9]
+
+---
